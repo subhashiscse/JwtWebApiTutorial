@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using JwtWebApiTutorial.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -35,6 +36,7 @@ namespace JwtWebApiTutorial.Controllers
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
             user.Username = request.Username;
+            user.Email = request.Email;
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
 
@@ -44,7 +46,7 @@ namespace JwtWebApiTutorial.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<string>> Login(UserDto request)
         {
-            if (user.Username != request.Username)
+            if (user.Email != request.Email)
             {
                 return BadRequest("User not found.");
             }
@@ -114,6 +116,7 @@ namespace JwtWebApiTutorial.Controllers
             List<Claim> claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, "Admin")
             };
 
